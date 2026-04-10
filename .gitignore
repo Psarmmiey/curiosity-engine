@@ -63,3 +63,4 @@ google-services.json
 # Test results
 /app/src/androidTest/java/
 test-results/
+.claude/worktrees/

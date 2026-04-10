@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Curiosity Engine</string>
+    <string name="widget_description">Shows your daily lesson progress and streak</string>
 </resources>

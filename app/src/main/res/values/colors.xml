@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Core palette -->
+    <color name="background_deep">#0F1E35</color>
+    <color name="surface_card">#162844</color>
+    <color name="surface_elevated">#1D3355</color>
+    <color name="brand_gold">#C8932A</color>
+    <color name="amber">#E8A020</color>
+    <color name="text_primary">#E8E4DB</color>
+    <color name="text_secondary">#8899AA</color>
+    <color name="text_muted">#4A5568</color>
+    <color name="error">#E05252</color>
+    <color name="success">#4AC58A</color>
+
+    <!-- Category colours -->
+    <color name="category_science">#1A7A6E</color>
+    <color name="category_nature">#2D6B2A</color>
+    <color name="category_history">#8B5A1C</color>
+    <color name="category_psychology">#6B2A8B</color>
+    <color name="category_technology">#1A4A8B</color>
+    <color name="category_art_culture">#8B1A4A</color>
+    <color name="category_economics">#2A6B4A</color>
+    <color name="category_philosophy">#4A4A8B</color>
+    <color name="category_surprise">#8B4A1A</color>
+</resources>

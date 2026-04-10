@@ -1,66 +1,17 @@
-# Local configuration — never commit secrets
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
 local.properties
-supabase/.env.local
-supabase/.env
-
-# Signing keystores
 *.jks
 *.keystore
 
-# Android build outputs
-/build/
-app/build/
-**/build/
-
-# Android Studio / IntelliJ IDEA
-.idea/
-*.iml
-*.ipr
-*.iws
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries
-.idea/caches
-.idea/modules.xml
-.idea/navEditor.xml
-
-# Gradle
-.gradle/
-gradle-wrapper.jar
-!gradle/wrapper/gradle-wrapper.jar
-local.properties
-
-# OS generated
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Kotlin
-*.class
-*.kotlin_module
-
-# Logs
-*.log
-
-# Google services
-google-services.json
-
-# Release APK/AAB
-*.apk
-*.aab
-
-# Proguard generated files
-/app/src/main/ic_launcher-playstore.png
-/app/src/main/res/mipmap*
-
-# Test results
-/app/src/androidTest/java/
-test-results/
-.claude/worktrees/
+# Supabase
+supabase/.env.local
+supabase/.branches
+supabase/.temp

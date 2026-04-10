@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.curiosityengine.app.data.model.LessonBlock
+import com.curiosityengine.app.ui.theme.BackgroundDeep
 import com.curiosityengine.app.ui.theme.BrandGold
 import com.curiosityengine.app.ui.theme.LatoFamily
 import com.curiosityengine.app.ui.theme.TextPrimary
@@ -53,7 +54,7 @@ fun VideoBlockView(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF0F1E35))
+            .background(BackgroundDeep)
             .clickable {
                 val customTabsIntent = CustomTabsIntent.Builder().build()
                 customTabsIntent.launchUrl(context, Uri.parse(youtubeUrl))

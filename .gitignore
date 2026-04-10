@@ -8,8 +8,21 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Build outputs
+app/build/
+**/build/
+
+# Signing
 *.jks
 *.keystore
+*.p12
+*.pfx
+keystore.properties
+signing.properties
+
+# Google Services (may contain API keys)
+google-services.json
 
 # Claude Code internal state
 .claude/

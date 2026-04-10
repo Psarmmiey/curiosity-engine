@@ -11,6 +11,9 @@ local.properties
 *.jks
 *.keystore
 
+# Claude Code internal state
+.claude/
+
 # Supabase
 supabase/.env.local
 supabase/.branches

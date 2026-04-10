@@ -1,10 +1,6 @@
 package com.curiosityengine.app.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -30,6 +26,8 @@ fun CuriosityNavHost(
         startDestination = startDestination,
         modifier = modifier,
     ) {
+
+        // ── Splash ────────────────────────────────────────────────────────────
         composable(NavRoute.Splash.route) {
             SplashScreen(
                 onAuthResult = { isAuthenticated ->
@@ -46,32 +44,21 @@ fun CuriosityNavHost(
             )
         }
 
+        // ── Auth ──────────────────────────────────────────────────────────────
+        // onSignedIn receives the userId so we can route to Onboarding with it
         composable(NavRoute.Auth.route) {
             val authViewModel: AuthViewModel = hiltViewModel()
-            // We track userId so onboarding can receive it
-            var signedInUserId by rememberSaveable { mutableStateOf<String?>(null) }
-
-            // Observe the auth state to capture the userId for onboarding routing
-            val authState by authViewModel.authState.collectAsStateWithLifecycle()
-
             AuthScreen(
                 viewModel = authViewModel,
-                onSignedIn = {
-                    val userId = (authState as? com.curiosityengine.app.feature.auth.AuthState.Authenticated)?.userId
-                    signedInUserId = userId
-                    if (userId != null) {
-                        navController.navigate(NavRoute.Onboarding.routeWithArg(userId)) {
-                            popUpTo(NavRoute.Auth.route) { inclusive = true }
-                        }
-                    } else {
-                        navController.navigate(NavRoute.Home.route) {
-                            popUpTo(NavRoute.Auth.route) { inclusive = true }
-                        }
+                onSignedIn = { userId ->
+                    navController.navigate(NavRoute.Onboarding.create(userId)) {
+                        popUpTo(NavRoute.Auth.route) { inclusive = true }
                     }
                 },
             )
         }
 
+        // ── Onboarding ────────────────────────────────────────────────────────
         composable(
             route = NavRoute.Onboarding.ROUTE_WITH_ARG,
             arguments = listOf(navArgument(NavRoute.Onboarding.ARG_USER_ID) { type = NavType.StringType }),
@@ -89,18 +76,22 @@ fun CuriosityNavHost(
             )
         }
 
+        // ── Home ──────────────────────────────────────────────────────────────
         composable(NavRoute.Home.route) {
             // Placeholder — HomeScreen implemented by Agent I
         }
 
+        // ── Journal ───────────────────────────────────────────────────────────
         composable(NavRoute.Journal.route) {
             // Placeholder — JournalScreen implemented by Agent L
         }
 
+        // ── Profile ───────────────────────────────────────────────────────────
         composable(NavRoute.Profile.route) {
             // Placeholder — ProfileScreen implemented by Agent L
         }
 
+        // ── Lesson ────────────────────────────────────────────────────────────
         composable(
             route = NavRoute.Lesson.ROUTE,
             arguments = listOf(navArgument(NavRoute.Lesson.ARG) { type = NavType.StringType }),
@@ -112,6 +103,7 @@ fun CuriosityNavHost(
             // Implemented by Agent F
         }
 
+        // ── Quiz ──────────────────────────────────────────────────────────────
         composable(
             route = NavRoute.Quiz.ROUTE,
             arguments = listOf(navArgument(NavRoute.Quiz.ARG) { type = NavType.StringType }),
@@ -120,6 +112,7 @@ fun CuriosityNavHost(
             // Implemented by Agent G
         }
 
+        // ── Quiz Results ──────────────────────────────────────────────────────
         composable(
             route = NavRoute.QuizResults.ROUTE,
             arguments = listOf(navArgument(NavRoute.QuizResults.ARG) { type = NavType.StringType }),
@@ -128,6 +121,7 @@ fun CuriosityNavHost(
             // Implemented by Agent G
         }
 
+        // ── Weekly Review ─────────────────────────────────────────────────────
         composable(
             route = NavRoute.WeeklyReview.route,
             deepLinks = listOf(
@@ -137,6 +131,7 @@ fun CuriosityNavHost(
             // Placeholder — WeeklyReviewScreen implemented by Agent G
         }
 
+        // ── Doom Scroll ───────────────────────────────────────────────────────
         composable(
             route = NavRoute.DoomScroll.route,
             deepLinks = listOf(
@@ -146,6 +141,7 @@ fun CuriosityNavHost(
             // Placeholder — DoomScrollScreen implemented by Agent J
         }
 
+        // ── Settings ──────────────────────────────────────────────────────────
         composable(NavRoute.Settings.route) {
             // Placeholder — SettingsScreen implemented by Agent L
         }

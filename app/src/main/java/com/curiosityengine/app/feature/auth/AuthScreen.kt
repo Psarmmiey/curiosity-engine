@@ -43,7 +43,7 @@ import com.curiosityengine.app.ui.theme.TextSecondary
 @Composable
 fun AuthScreen(
     viewModel: AuthViewModel,
-    onSignedIn: () -> Unit,
+    onSignedIn: (userId: String) -> Unit,
 ) {
     val authState by viewModel.authState.collectAsState()
     val context = LocalContext.current
@@ -51,7 +51,7 @@ fun AuthScreen(
 
     LaunchedEffect(authState) {
         when (val state = authState) {
-            is AuthState.Authenticated -> onSignedIn()
+            is AuthState.Authenticated -> onSignedIn(state.userId)
             is AuthState.Error -> snackbarHostState.showSnackbar(state.message)
             else -> Unit
         }

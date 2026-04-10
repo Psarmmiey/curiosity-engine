@@ -114,6 +114,9 @@ identity-googleid = { module = "com.google.android.libraries.identity.googleid:g
 # Splashscreen
 core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
 
+# Browser (Chrome Custom Tabs)
+androidx-browser = { module = "androidx.browser:browser", version = "1.8.0" }
+
 # Timber
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 

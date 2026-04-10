@@ -164,6 +164,9 @@ dependencies {
     implementation(libs.credentials.play.services.auth)
     implementation(libs.identity.googleid)
 
+    // Browser (Chrome Custom Tabs)
+    implementation(libs.androidx.browser)
+
     // Splashscreen
     implementation(libs.core.splashscreen)
 

@@ -61,6 +61,8 @@ fun AuthScreen(
         modifier = Modifier.fillMaxSize(),
         color = BackgroundDeep,
     ) {
+        val isLoading = authState is AuthState.Loading
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,8 +97,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(64.dp))
 
-            val isLoading = authState is AuthState.Loading
-
             Button(
                 onClick = { if (!isLoading) viewModel.signInWithGoogle(context) },
                 modifier = Modifier
@@ -129,20 +129,19 @@ fun AuthScreen(
                     )
                 }
             }
-        }
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            snackbar = { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = SurfaceCard,
-                    contentColor = TextPrimary,
-                )
-            },
-        )
+            Spacer(modifier = Modifier.height(32.dp))
+
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = SurfaceCard,
+                        contentColor = TextPrimary,
+                    )
+                },
+            )
+        }
     }
 }

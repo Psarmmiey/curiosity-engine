@@ -3,7 +3,6 @@ package com.curiosityengine.app.feature.lesson
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,14 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.curiosityengine.app.data.model.Reference
-import com.curiosityengine.app.data.repository.StreakRepository
 import com.curiosityengine.app.feature.lesson.block.BlockRenderer
 import com.curiosityengine.app.ui.components.CategoryChip
 import com.curiosityengine.app.ui.theme.BackgroundDeep
 import com.curiosityengine.app.ui.theme.BrandGold
 import com.curiosityengine.app.ui.theme.TextPrimary
 import com.curiosityengine.app.ui.theme.TextSecondary
-import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,36 +59,6 @@ fun LessonScreen(
     onNavigateToQuiz: (String) -> Unit,
     onNavigateBack: () -> Unit,
     viewModel: LessonViewModel = hiltViewModel(),
-    streakRepository: StreakRepository = hiltViewModel<LessonViewModel>().let {
-        // StreakRepository is injected into the ViewModel — we expose it via a helper
-        // In practice, the overlay receives it from the ViewModel's injected field.
-        // We pass a reference via rememberUpdatedState pattern below.
-        // The StreakRepository is accessed inside LessonCompletionOverlay via a separate parameter.
-        // We'll inject it separately here using Hilt entry point.
-        // However, since we can't call hiltViewModel() for a repository directly,
-        // we use the ViewModel's exposed streak repository instead.
-        // This is handled below with a workaround via the ViewModel.
-        it // not used, see below
-        @Suppress("UNCHECKED_CAST")
-        it as StreakRepository // won't compile — use different approach below
-    },
-) {
-    // Re-implement without the invalid injection above
-    LessonScreenContent(
-        lessonId = lessonId,
-        onNavigateToQuiz = onNavigateToQuiz,
-        onNavigateBack = onNavigateBack,
-        viewModel = viewModel,
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun LessonScreenContent(
-    lessonId: String,
-    onNavigateToQuiz: (String) -> Unit,
-    onNavigateBack: () -> Unit,
-    viewModel: LessonViewModel,
 ) {
     LaunchedEffect(lessonId) {
         viewModel.loadLesson(lessonId)
@@ -167,24 +133,25 @@ private fun LessonScreenContent(
                     val lesson = state.lesson
                     val listState = rememberLazyListState()
 
-                    // Compute scroll progress based on first visible index + total items
+                    // Compute scroll progress and forward to ViewModel
                     LaunchedEffect(listState) {
                         snapshotFlow {
                             val layoutInfo = listState.layoutInfo
                             val totalItems = layoutInfo.totalItemsCount
                             if (totalItems == 0) return@snapshotFlow 0f
-                            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                            // Add fractional offset for partial visibility
-                            val lastOffset = layoutInfo.visibleItemsInfo.lastOrNull()?.let { item ->
-                                val visibleBottom = item.offset + item.size
+                            val visibleItems = layoutInfo.visibleItemsInfo
+                            val lastVisible = visibleItems.lastOrNull() ?: return@snapshotFlow 0f
+                            // Fraction of the last visible item that is actually shown
+                            val lastFraction = run {
+                                val visibleBottom = lastVisible.offset + lastVisible.size
                                 val viewportEnd = layoutInfo.viewportEndOffset
                                 if (visibleBottom > viewportEnd) {
-                                    (viewportEnd - item.offset).toFloat() / item.size.toFloat()
+                                    (viewportEnd - lastVisible.offset).toFloat() / lastVisible.size.toFloat()
                                 } else {
                                     1f
                                 }
-                            } ?: 0f
-                            val progress = (lastVisible + lastOffset) / totalItems.toFloat()
+                            }
+                            val progress = (lastVisible.index + lastFraction) / totalItems.toFloat()
                             progress.coerceIn(0f, 1f)
                         }.collect { progress ->
                             viewModel.updateScrollProgress(progress)
@@ -235,13 +202,15 @@ private fun LessonScreenContent(
                             )
                         }
 
-                        // References section
+                        // References section (expandable)
                         if (lesson.references.isNotEmpty()) {
-                            item(key = "references_header") {
+                            item(key = "references_divider") {
                                 HorizontalDivider(
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                     color = TextSecondary.copy(alpha = 0.2f),
                                 )
+                            }
+                            item(key = "references_header") {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -256,13 +225,13 @@ private fun LessonScreenContent(
                                         modifier = Modifier.weight(1f),
                                     )
                                     Icon(
-                                        imageVector = if (referencesExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                        imageVector = if (referencesExpanded) Icons.Filled.ExpandLess
+                                        else Icons.Filled.ExpandMore,
                                         contentDescription = if (referencesExpanded) "Collapse" else "Expand",
                                         tint = TextSecondary,
                                     )
                                 }
                             }
-
                             item(key = "references_content") {
                                 AnimatedVisibility(
                                     visible = referencesExpanded,
@@ -277,7 +246,7 @@ private fun LessonScreenContent(
                                     ) {
                                         lesson.references.forEach { ref ->
                                             ReferenceItem(reference = ref)
-                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Spacer(modifier = Modifier.height(10.dp))
                                         }
                                     }
                                 }
@@ -290,7 +259,7 @@ private fun LessonScreenContent(
                         }
                     }
 
-                    // Completion overlay
+                    // Completion overlay (ModalBottomSheet)
                     if (showCompletionOverlay) {
                         LessonCompletionOverlay(
                             lesson = lesson,

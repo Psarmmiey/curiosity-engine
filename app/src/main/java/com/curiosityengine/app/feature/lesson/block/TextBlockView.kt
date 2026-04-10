@@ -10,8 +10,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.curiosityengine.app.data.model.LessonBlock
-import com.curiosityengine.app.ui.theme.BrandGold
-import com.curiosityengine.app.ui.theme.DmSerifDisplayFamily
 import com.curiosityengine.app.ui.theme.LatoFamily
 import com.curiosityengine.app.ui.theme.TextPrimary
 

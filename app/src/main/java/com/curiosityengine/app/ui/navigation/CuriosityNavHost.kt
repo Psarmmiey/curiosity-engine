@@ -12,14 +12,25 @@ import androidx.navigation.navDeepLink
 import com.curiosityengine.app.feature.auth.AuthScreen
 import com.curiosityengine.app.feature.auth.AuthViewModel
 import com.curiosityengine.app.feature.auth.SplashScreen
+import com.curiosityengine.app.feature.doomscroll.DoomScrollScreen
+import com.curiosityengine.app.feature.home.HomeScreen
+import com.curiosityengine.app.feature.journal.JournalScreen
+import com.curiosityengine.app.feature.lesson.LessonScreen
 import com.curiosityengine.app.feature.onboarding.OnboardingScreen
 import com.curiosityengine.app.feature.onboarding.OnboardingViewModel
+import com.curiosityengine.app.feature.profile.ProfileScreen
+import com.curiosityengine.app.feature.quiz.QuizResultsScreen
+import com.curiosityengine.app.feature.quiz.QuizScreen
+import com.curiosityengine.app.feature.quiz.WeeklyReviewScreen
+import com.curiosityengine.app.feature.settings.SettingsScreen
 
 @Composable
 fun CuriosityNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: String = NavRoute.Splash.route,
+    onStartRealtimeSync: (userId: String) -> Unit = {},
+    onStopRealtimeSync: () -> Unit = {},
 ) {
     NavHost(
         navController = navController,
@@ -45,12 +56,13 @@ fun CuriosityNavHost(
         }
 
         // ── Auth ──────────────────────────────────────────────────────────────
-        // onSignedIn receives the userId so we can route to Onboarding with it
         composable(NavRoute.Auth.route) {
             val authViewModel: AuthViewModel = hiltViewModel()
             AuthScreen(
                 viewModel = authViewModel,
                 onSignedIn = { userId ->
+                    onStartRealtimeSync(userId)
+                    // Check if onboarding is needed; route to Onboarding with userId
                     navController.navigate(NavRoute.Onboarding.create(userId)) {
                         popUpTo(NavRoute.Auth.route) { inclusive = true }
                     }
@@ -78,17 +90,44 @@ fun CuriosityNavHost(
 
         // ── Home ──────────────────────────────────────────────────────────────
         composable(NavRoute.Home.route) {
-            // Placeholder — HomeScreen implemented by Agent I
+            HomeScreen(
+                onNavigateToLesson = { lessonId ->
+                    navController.navigate(NavRoute.Lesson.create(lessonId))
+                },
+                onNavigateToDoomScroll = {
+                    navController.navigate(NavRoute.DoomScroll.route)
+                },
+                onNavigateToWeeklyReview = {
+                    navController.navigate(NavRoute.WeeklyReview.route)
+                },
+            )
         }
 
         // ── Journal ───────────────────────────────────────────────────────────
         composable(NavRoute.Journal.route) {
-            // Placeholder — JournalScreen implemented by Agent L
+            JournalScreen(
+                onNavigateToLesson = { lessonId ->
+                    navController.navigate(NavRoute.Lesson.create(lessonId))
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
 
         // ── Profile ───────────────────────────────────────────────────────────
         composable(NavRoute.Profile.route) {
-            // Placeholder — ProfileScreen implemented by Agent L
+            ProfileScreen(
+                onSignOut = {
+                    onStopRealtimeSync()
+                    navController.navigate(NavRoute.Auth.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
 
         // ── Lesson ────────────────────────────────────────────────────────────
@@ -99,8 +138,16 @@ fun CuriosityNavHost(
                 navDeepLink { uriPattern = "curiosityengine://lesson/{lessonId}" }
             ),
         ) { backStackEntry ->
-            // LessonScreen(lessonId = backStackEntry.arguments?.getString(NavRoute.Lesson.ARG) ?: "")
-            // Implemented by Agent F
+            val lessonId = backStackEntry.arguments?.getString(NavRoute.Lesson.ARG) ?: ""
+            LessonScreen(
+                lessonId = lessonId,
+                onNavigateToQuiz = { id ->
+                    navController.navigate(NavRoute.Quiz.create(id))
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
 
         // ── Quiz ──────────────────────────────────────────────────────────────
@@ -108,8 +155,18 @@ fun CuriosityNavHost(
             route = NavRoute.Quiz.ROUTE,
             arguments = listOf(navArgument(NavRoute.Quiz.ARG) { type = NavType.StringType }),
         ) { backStackEntry ->
-            // QuizScreen(lessonId = backStackEntry.arguments?.getString(NavRoute.Quiz.ARG) ?: "")
-            // Implemented by Agent G
+            val lessonId = backStackEntry.arguments?.getString(NavRoute.Quiz.ARG) ?: ""
+            QuizScreen(
+                lessonId = lessonId,
+                onQuizComplete = { id ->
+                    navController.navigate(NavRoute.QuizResults.create(id)) {
+                        popUpTo(NavRoute.Quiz.ROUTE) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
 
         // ── Quiz Results ──────────────────────────────────────────────────────
@@ -117,8 +174,18 @@ fun CuriosityNavHost(
             route = NavRoute.QuizResults.ROUTE,
             arguments = listOf(navArgument(NavRoute.QuizResults.ARG) { type = NavType.StringType }),
         ) { backStackEntry ->
-            // QuizResultsScreen(resultId = backStackEntry.arguments?.getString(NavRoute.QuizResults.ARG) ?: "")
-            // Implemented by Agent G
+            val lessonId = backStackEntry.arguments?.getString(NavRoute.QuizResults.ARG) ?: ""
+            QuizResultsScreen(
+                lessonId = lessonId,
+                onNavigateHome = {
+                    navController.navigate(NavRoute.Home.route) {
+                        popUpTo(NavRoute.Home.route) { inclusive = false }
+                    }
+                },
+                onShareResult = {
+                    // Share intent handled via ShareHelper/ShareViewModel at screen level
+                },
+            )
         }
 
         // ── Weekly Review ─────────────────────────────────────────────────────
@@ -128,7 +195,16 @@ fun CuriosityNavHost(
                 navDeepLink { uriPattern = "curiosityengine://quiz/weekly" }
             ),
         ) {
-            // Placeholder — WeeklyReviewScreen implemented by Agent G
+            WeeklyReviewScreen(
+                onComplete = {
+                    navController.navigate(NavRoute.Home.route) {
+                        popUpTo(NavRoute.WeeklyReview.route) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
 
         // ── Doom Scroll ───────────────────────────────────────────────────────
@@ -138,12 +214,23 @@ fun CuriosityNavHost(
                 navDeepLink { uriPattern = "curiosityengine://doom-scroll" }
             ),
         ) {
-            // Placeholder — DoomScrollScreen implemented by Agent J
+            DoomScrollScreen(
+                onNavigateToLesson = { lessonId ->
+                    navController.navigate(NavRoute.Lesson.create(lessonId))
+                },
+                onExit = {
+                    navController.popBackStack()
+                },
+            )
         }
 
         // ── Settings ──────────────────────────────────────────────────────────
         composable(NavRoute.Settings.route) {
-            // Placeholder — SettingsScreen implemented by Agent L
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+            )
         }
     }
 }

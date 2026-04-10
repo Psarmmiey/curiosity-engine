@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.CuriosityEngine" parent="android:Theme.Material.NoTitleBar" />
+</resources>

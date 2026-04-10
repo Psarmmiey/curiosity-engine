@@ -1,0 +1,7 @@
+-keep class com.curiosityengine.app.data.model.** { *; }
+-keep class kotlinx.serialization.** { *; }
+-keepattributes *Annotation*, InnerClasses, Signature
+-dontnote kotlinx.serialization.AnnotationsKt
+-keepclassmembers class kotlinx.serialization.json.** { *** Companion; }
+-keepclasseswithmembers class kotlinx.serialization.** { kotlinx.serialization.KSerializer serializer(...); }
+-keep,includedescriptorclasses class com.curiosityengine.app.**$$serializer { *; }

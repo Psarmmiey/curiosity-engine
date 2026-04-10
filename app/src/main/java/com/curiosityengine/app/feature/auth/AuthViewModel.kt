@@ -7,6 +7,7 @@ import com.curiosityengine.app.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,7 +60,7 @@ class AuthViewModel @Inject constructor(
                 }
                 supabase.auth.signInWith(IDToken) {
                     this.idToken = idToken
-                    provider = io.github.jan.supabase.auth.providers.Google
+                    provider = Google
                 }
                 val session = supabase.auth.currentSessionOrNull()
                 val userId = session?.user?.id

@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LessonViewModel @Inject constructor(
     private val lessonRepository: LessonRepository,
-    private val streakRepository: StreakRepository,
+    val streakRepository: StreakRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LessonUiState>(LessonUiState.Loading)

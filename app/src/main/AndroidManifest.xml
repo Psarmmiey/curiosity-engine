@@ -49,6 +49,29 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
+        <!-- Glance widget receivers -->
+        <receiver
+            android:name=".widget.CuriosityWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/curiosity_widget_4x2_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.CuriosityWidget2x2Receiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/curiosity_widget_2x2_info" />
+        </receiver>
+
         <!-- WorkManager initializer (manual init for Hilt) -->
         <provider
             android:name="androidx.startup.InitializationProvider"

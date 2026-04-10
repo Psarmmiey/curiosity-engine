@@ -3,7 +3,11 @@ package com.curiosityengine.app.ui.navigation
 sealed class NavRoute(val route: String) {
     data object Splash          : NavRoute("splash")
     data object Auth            : NavRoute("auth")
-    data object Onboarding      : NavRoute("onboarding")
+    data object Onboarding      : NavRoute("onboarding/{userId}") {
+        const val ROUTE_WITH_ARG = "onboarding/{userId}"
+        const val ARG_USER_ID = "userId"
+        fun create(userId: String) = "onboarding/$userId"
+    }
     data object Home            : NavRoute("home")
     data object Journal         : NavRoute("journal")
     data object Profile         : NavRoute("profile")
